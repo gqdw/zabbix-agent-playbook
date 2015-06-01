@@ -1,0 +1,22 @@
+---
+- hosts: test
+  remote_user: root
+#  sudo: yes
+  vars:
+    hostname: "{{ansible_hostname}}"
+  tasks:
+    - name: cp zabbix-release-2.2-1.el6.noarch.rpm
+      copy: src=zabbix-release-2.2-1.el6.noarch.rpm dest=/opt/zabbix-release-2.2-1.el6.noarch.rpm
+    - name: install zabbix repo 
+      yum: name=/opt/zabbix-release-2.2-1.el6.noarch.rpm state=present
+    - name: install zabbix agent 2.2
+      yum: name=zabbix-agent state=present
+    - name: Copy zabbix configuration to /etc/zabbix/zabbix_agentd.conf
+      template: src=zabbix_agentd.j2 dest=/etc/zabbix/zabbix_agentd.conf
+      notify: restart zabbix
+    
+    - name: ensure zabbix running on power
+      service: name=zabbix-agent enabled=yes
+  handlers:
+    - name: restart zabbix
+      service: name=zabbix-agent state=restarted 
