@@ -12,12 +12,13 @@
 
     - name: install zabbix repo
       apt: deb="/opt/zabbix-release_2.2-1+wheezy_all.deb" state=present
-    - name: apt-get update
-      apt: update_cache=yes
+
+#    - name: apt-get update
+#      apt: update_cache=yes
 
 
     - name: install zabbix agent 2.2
-      apt: name=zabbix-agent state=present
+      apt: name=zabbix-agent state=installed update_cache=yes cache_valid_time=3600
 
     - name: Copy zabbix configuration to /etc/zabbix/zabbix_agentd.conf
       template: src=zabbix_agentd.j2 dest=/etc/zabbix/zabbix_agentd.conf
