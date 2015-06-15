@@ -1,7 +1,9 @@
 ---
-- hosts: test
-  remote_user: root
-#  sudo: yes
+- hosts: cloud
+#- hosts: production
+  remote_user: zyadmin
+  #remote_user: root
+  sudo: yes
   vars:
     hostname: "{{ansible_hostname}}"
   tasks:
@@ -20,7 +22,12 @@
     - name: Copy zabbix configuration to /etc/zabbix/zabbix_agentd.conf
       template: src=zabbix_agentd.j2 dest=/etc/zabbix/zabbix_agentd.conf
       notify: restart zabbix
-
+    - name: Copy files to /etc/zabbix/zabbix_agentd.conf.d/
+      copy: src=./files/{{ item }} dest=/etc/zabbix/zabbix_agentd.d/{{ item }}
+#      copy: src=files/userparameter_nginx.conf dest=/etc/zabbix/zabbix_agentd.conf.d/userparameter_nginx.conf
+      with_items:
+        -  userparameter_nginx.conf
+        -  userparameter_php-fpm.conf
     - name: ensure zabbix running on power
       service: name=zabbix-agent enabled=yes
   handlers:
