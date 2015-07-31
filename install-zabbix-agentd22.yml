@@ -11,8 +11,12 @@
     - name: install zabbix repo 
       yum: name=/opt/zabbix-release-2.2-1.el6.noarch.rpm state=present
 
-    - name: install zabbix agent 2.2
-      yum: name=zabbix-agent state=present
+    - name: install zabbix agent 2.2 and zabbix-get
+#      yum: name=zabbix-agent state=present
+      yum: name={{ item }} state=present
+      with_items:
+        - zabbix-agent
+        - zabbix-get
 
     - name: Copy zabbix configuration to /etc/zabbix/zabbix_agentd.conf
       template: src=zabbix_agentd.j2 dest=/etc/zabbix/zabbix_agentd.conf
