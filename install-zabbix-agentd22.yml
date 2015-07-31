@@ -13,7 +13,7 @@
 
     - name: install zabbix agent 2.2 and zabbix-get
 #      yum: name=zabbix-agent state=present
-      yum: name={{ item }} state=present
+      yum: name={{ item }} state=present update_cache=yes
       with_items:
         - zabbix-agent
         - zabbix-get
