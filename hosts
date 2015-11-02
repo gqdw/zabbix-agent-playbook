@@ -8,4 +8,5 @@
 121.40.83.37 ansible_ssh_port=40022 
 121.43.145.11 ansible_ssh_port=40022
 121.41.113.218 ansible_ssh_port=40022
-
+[tg]
+121.199.73.229
