@@ -4,6 +4,7 @@
 #  sudo: yes
   vars:
     hostname: "{{ansible_hostname}}"
+    server_name: "192.168.100.28"
   tasks:
     - name: cp zabbix-release-2.2-1.el6.noarch.rpm
       copy: src=files/zabbix-release-2.2-1.el6.noarch.rpm dest=/opt/zabbix-release-2.2-1.el6.noarch.rpm
