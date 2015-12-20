@@ -1,0 +1,13 @@
+
+---
+- hosts: test
+  remote_user: root
+#  sudo: yes
+  vars:
+    hostname: "{{ansible_hostname}}"
+  tasks:
+    - shell: pwd
+      when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int >= 6
+    - shell: pwd
+      when: ansible_os_family == "RedHat" 
+# and ansible_lsb.major_release|int >= 7
