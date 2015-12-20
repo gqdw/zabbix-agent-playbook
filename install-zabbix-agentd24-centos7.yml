@@ -1,0 +1,31 @@
+---
+- hosts: test
+  remote_user: root
+#  sudo: yes
+  vars:
+    hostname: "{{ansible_hostname}}"
+    server_name: "192.168.100.28"
+  tasks:
+    - name: cp zabbix-release-2.4-1.el7.noarch.rpm
+      copy: src=files/zabbix-release-2.4-1.el7.noarch.rpm dest=/opt/zabbix-release-2.4-1.el7.noarch.rpm
+
+    - name: install zabbix repo 
+      yum: name=/opt/zabbix-release-2.4-1.el7.noarch.rpm state=present
+
+    - name: install zabbix agent and zabbix-get
+#      yum: name=zabbix-agent state=present
+      yum: name={{ item }} state=present update_cache=yes
+      with_items:
+        - zabbix-agent
+        - zabbix-get
+
+    - name: Copy zabbix configuration to /etc/zabbix/zabbix_agentd.conf
+      template: src=files/zabbix_agentd.j2 dest=/etc/zabbix/zabbix_agentd.conf
+      notify: restart zabbix
+    
+    - name: ensure zabbix running on power
+      service: name=zabbix-agent enabled=yes
+  handlers:
+
+    - name: restart zabbix
+      service: name=zabbix-agent state=restarted 
