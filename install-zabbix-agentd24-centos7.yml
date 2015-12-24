@@ -4,13 +4,24 @@
 #  sudo: yes
   vars:
     hostname: "{{ansible_hostname}}"
-    server_name: "192.168.100.28"
+    server_name: "10.168.158.128"
+    # server_name: "192.168.100.28"
   tasks:
     - name: cp zabbix-release-2.4-1.el7.noarch.rpm
       copy: src=files/zabbix-release-2.4-1.el7.noarch.rpm dest=/opt/zabbix-release-2.4-1.el7.noarch.rpm
+      when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int = 7
+
+    - name: cp zabbix-release-2.4-1.el6.noarch.rpm
+      copy: src=files/zabbix-release-2.4-1.el6.noarch.rpm dest=/opt/zabbix-release-2.4-1.el6.noarch.rpm
+      when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int = 6
 
     - name: install zabbix repo 
       yum: name=/opt/zabbix-release-2.4-1.el7.noarch.rpm state=present
+      when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int = 7
+
+    - name: install zabbix repo 
+      yum: name=/opt/zabbix-release-2.4-1.el6.noarch.rpm state=present
+      when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int = 6
 
     - name: install zabbix agent and zabbix-get
 #      yum: name=zabbix-agent state=present
