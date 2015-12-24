@@ -15,15 +15,15 @@
       copy: src=files/zabbix-release-2.4-1.el6.noarch.rpm dest=/opt/zabbix-release-2.4-1.el6.noarch.rpm
       when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 6
 
-    - name: install zabbix repo 
+    - name: install zabbix repo zabbix-release-2.4-1.el7.noarch.rpm
       yum: name=/opt/zabbix-release-2.4-1.el7.noarch.rpm state=present
       when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 7
 
-    - name: install zabbix repo 
+    - name: install zabbix repo zabbix-release-2.4-1.el6.noarch.rpm
       yum: name=/opt/zabbix-release-2.4-1.el6.noarch.rpm state=present
       when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 6
 
-    - name: install zabbix agent and zabbix-get
+    - name: install zabbix-agent and zabbix-get
 #      yum: name=zabbix-agent state=present
       yum: name={{ item }} state=present update_cache=yes
       with_items:
