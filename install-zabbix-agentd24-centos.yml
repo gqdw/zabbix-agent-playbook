@@ -38,9 +38,9 @@
       template: src=files/zabbix_agentd.j2 dest=/etc/zabbix/zabbix_agentd.conf
       notify: restart zabbix
     
-    - name: ensure zabbix running on power
-      service: name=zabbix-agent enabled=yes
+#    - name: ensure zabbix running on power
+#      service: name=zabbix-agent enabled=yes
   handlers:
 
     - name: restart zabbix
-      service: name=zabbix-agent state=restarted 
+      service: name=zabbix-agent state=restarted enabled=yes
