@@ -1,0 +1,36 @@
+---
+- hosts: do
+# - hosts: zhaime
+  remote_user: root
+#  sudo: yes
+  vars:
+    hostname: "{{ansible_hostname}}"
+    server_name: "zabbix.hq.eastmoney.com"
+    # server_name: "192.168.100.28"
+  tasks:
+    - name: cp zabbix-release-3.0-1.el5.noarch.rpm
+      copy: src=files/zabbix-release-3.0-1.el5.noarch.rpm dest=/opt/zabbix-release-3.0-1.el5.noarch.rpm
+      when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 5
+
+
+
+#    - name: change yum.conf timeout=10
+#      lineinfile: dest=/etc/yum.conf regexp='^timeout=3' line='timeout=10'
+
+    - name: install zabbix-agent and zabbix-get
+#      yum: name=zabbix-agent state=present
+      yum: name={{ item }} state=present update_cache=yes
+      with_items:
+        - zabbix-agent
+        - zabbix-get
+
+    - name: Copy zabbix configuration to /etc/zabbix/zabbix_agentd.conf
+      template: src=files/zabbix_agentd.j2 dest=/etc/zabbix/zabbix_agentd.conf
+      notify: restart zabbix
+    
+#    - name: ensure zabbix running on power
+#      service: name=zabbix-agent enabled=yes
+  handlers:
+
+    - name: restart zabbix
+      service: name=zabbix-agent state=restarted enabled=yes
