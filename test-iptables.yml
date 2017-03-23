@@ -10,6 +10,8 @@
   - iptables:
       chain: INPUT
       source: 8.8.8.8
+      protocol: tcp
+      destination_port: 10050
       jump: ACCEPT
     become: yes
 
