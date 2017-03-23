@@ -1,0 +1,15 @@
+---
+- hosts: test
+  remote_user: aca
+  sudo: yes
+  vars:
+    hostname: "{{ansible_hostname}}"
+    server_name: "zabbix.hq.eastmoney.com"
+    # server_name: "192.168.100.28"
+  tasks:
+  - iptables:
+      chain: INPUT
+      source: 8.8.8.8
+      jump: ACCEPT
+    become: yes
+
