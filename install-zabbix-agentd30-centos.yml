@@ -8,28 +8,59 @@
     server_name: "zabbix.hq.eastmoney.com"
     # server_name: "192.168.100.28"
   tasks:
-    - name: cp zabbix-release-3.0-1.el5.noarch.rpm
-      copy: src=files/zabbix-release-3.0-1.el5.noarch.rpm dest=/opt/zabbix-release-3.0-1.el5.noarch.rpm
+    - name: cp zabbix rpms
+      # copy: src=files/zabbix-release-3.0-1.el5.noarch.rpm dest=/opt/zabbix-release-3.0-1.el5.noarch.rpm
+      copy: src=files/{{ item }} dest=/opt/{{ item }}
+      with_items:
+        - zabbix-release-3.0-1.el5.noarch.rpm
+        - zabbix-agent-3.0.8-1.el5.x86_64.rpm
+        - zabbix-get-3.0.8-1.el5.x86_64.rpm
       when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 5
 
 
-
-#    - name: change yum.conf timeout=10
-#      lineinfile: dest=/etc/yum.conf regexp='^timeout=3' line='timeout=10'
-
-    - name: install zabbix-agent and zabbix-get
-#      yum: name=zabbix-agent state=present
-      yum: name={{ item }} state=present update_cache=yes
+    - name: cp zabbix rpms
+      copy: src=files/{{ item }} dest=/opt/{{ item }}
       with_items:
-        - zabbix-agent
-        - zabbix-get
+        - zabbix-release-3.0-1.el6.noarch.rpm
+        - zabbix-agent-3.0.8-1.el6.x86_64.rpm
+        - zabbix-get-3.0.8-1.el6.x86_64.rpm
+      when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 6
+
+#    - name: install zabbix repo zabbix-release-3.0-1.el5.noarch.rpm
+#      yum: name=/opt/zabbix-release-3.0-1.el5.noarch.rpm state=present
+#      when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 5
+
+    - shell: rpm -ivh  /opt/zabbix-release-3.0-1.el5.noarch.rpm /opt/zabbix-agent-3.0.8-1.el5.x86_64.rpm /opt/zabbix-get-3.0.8-1.el5.x86_64.rpm
+      when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 5
+
+    - shell: rpm -ivh  /opt/zabbix-release-3.0-1.el6.noarch.rpm /opt/zabbix-agent-3.0.8-1.el6.x86_64.rpm /opt/zabbix-get-3.0.8-1.el6.x86_64.rpm
+      when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 6
+
+    - name: change yum.conf timeout=10
+      lineinfile: dest=/etc/yum.conf regexp='^timeout=3' line='timeout=10'
+
+#    - name: install zabbix-agent and zabbix-get
+#      yum: name={{ item }} state=present update_cache=yes
+#      with_items:
+#        - zabbix-agent
+#        - zabbix-get
 
     - name: Copy zabbix configuration to /etc/zabbix/zabbix_agentd.conf
       template: src=files/zabbix_agentd.j2 dest=/etc/zabbix/zabbix_agentd.conf
       notify: restart zabbix
-    
+
+    - name: copy redis conf to /etc/zabbix/zabbix_agentd.d/redis.conf
+      template: src=files/userparameter_redis.conf dest=/etc/zabbix/zabbix_agentd.d/redis.conf
+      notify: restart zabbix
+
 #    - name: ensure zabbix running on power
 #      service: name=zabbix-agent enabled=yes
+    - iptables:
+        chain: INPUT
+        source: 42.159.231.31
+        jump: ACCEPT
+      become: yes
+    - shell: /etc/init.d/iptables save
   handlers:
 
     - name: restart zabbix
