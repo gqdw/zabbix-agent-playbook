@@ -6,8 +6,10 @@
   vars:
     hostname: "{{ansible_hostname}}"
     server_name: "zabbix.hq.eastmoney.com"
+    ListenPort: "20050"
     # server_name: "192.168.100.28"
   tasks:
+
     - name: cp zabbix rpms
       # copy: src=files/zabbix-release-3.0-1.el5.noarch.rpm dest=/opt/zabbix-release-3.0-1.el5.noarch.rpm
       copy: src=files/{{ item }} dest=/opt/{{ item }}
@@ -32,9 +34,11 @@
 
     - shell: rpm -ivh  /opt/zabbix-release-3.0-1.el5.noarch.rpm /opt/zabbix-agent-3.0.8-1.el5.x86_64.rpm /opt/zabbix-get-3.0.8-1.el5.x86_64.rpm
       when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 5
+      ignore_errors: True
 
     - shell: rpm -ivh  /opt/zabbix-release-3.0-1.el6.noarch.rpm /opt/zabbix-agent-3.0.8-1.el6.x86_64.rpm /opt/zabbix-get-3.0.8-1.el6.x86_64.rpm
       when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 6
+      ignore_errors: True
 
     - name: change yum.conf timeout=10
       lineinfile: dest=/etc/yum.conf regexp='^timeout=3' line='timeout=10'
@@ -58,7 +62,9 @@
     - iptables:
         chain: INPUT
         source: 42.159.231.31
+        ctstate: new
         jump: ACCEPT
+        action: insert
       become: yes
     - shell: /etc/init.d/iptables save
   handlers:
